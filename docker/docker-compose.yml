@@ -1,0 +1,33 @@
+services:
+  car:
+    image: osrm-backend:$COUNTRY
+    ports:
+       - "5000:5000"
+    environment:
+      COUNTRY: "$COUNTRY"
+      PROFILE: "car"
+    build:
+      context: .
+      dockerfile: "docker/Dockerfile"
+      args: 
+         - "COUNTRY=$COUNTRY"
+         - "CONTINENT=$CONTINENT"
+  bike:
+    image: osrm-backend:$COUNTRY
+    ports:
+       - "5001:5000"
+    environment:
+      COUNTRY: "$COUNTRY"
+      PROFILE: "bicycle"
+    depends_on:
+        - car
+
+  foot:
+    image: osrm-backend:$COUNTRY
+    ports:
+       - "5002:5000"
+    environment:
+      COUNTRY: "$COUNTRY"
+      PROFILE: "foot"
+    depends_on:
+        - bike
