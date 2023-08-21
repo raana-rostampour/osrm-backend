@@ -62,6 +62,25 @@ RUN /usr/local/bin/osrm-extract --help && \
     /usr/local/bin/osrm-partition --help && \
     /usr/local/bin/osrm-customize --help
 
+FROM runstage
+
 WORKDIR /opt
 
+ARG CONTINENT=asia
+ARG COUNTRY=iran
+ARG PROFILE=car
+
+RUN apt update && apt install wget -y
+
+RUN wget  "http://download.geofabrik.de/$CONTINENT/$COUNTRY-latest.osm.pbf" -P /data/
+
+RUN for profile in car bicycle foot; do \
+    mkdir -p /data/$profile/ && \
+    ln -sf /data/$COUNTRY-latest.osm.pbf /data/$profile/ && \
+    osrm-extract -p "/opt/$profile.lua" "/data/$profile/$COUNTRY-latest.osm.pbf" || echo "osrm-extract failed" && \
+    osrm-partition "/data/$profile/$COUNTRY-latest.osrm" || echo "osrm-partition failed"  && \
+    osrm-customize "/data/$profile/$COUNTRY-latest.osrm" || echo "osrm-customize failed"; done
+
 EXPOSE 5000
+
+CMD [ "/bin/sh" , "-c" , "osrm-routed --algorithm mld /data/$PROFILE/$COUNTRY-latest.osrm" ]
