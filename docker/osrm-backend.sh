@@ -19,9 +19,9 @@ function get_geo_addrese(){
                 }
 function print_result(){
         distance=`measure_distance`
-        echo "your trip is about $distance meters"
+        echo "your trip is about $distance meters" |tee -a output.txt
         duration=`measure_duration`
-        echo "your trip takes long about `seconds_to_hours $duration`"
+        echo "your trip takes long about `seconds_to_hours $duration`" |tee -a output.txt
 }
 
 function seconds_to_hours() {
@@ -40,7 +40,7 @@ function seconds_to_hours() {
 
 
 clear
-
+rm output.txt 2>/dev/null
 echo "Please Provide your Continent/Country (default: $DEFAULT_CONTINENT /$DEFAULT_COUNTRY )"
 
 read -p $'Continent: ' CONTINENT
